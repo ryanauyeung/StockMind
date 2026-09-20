@@ -1,7 +1,7 @@
 import pandas as pd
 
-from trendline.ledger import fade_score, new_ledger, planned_orders, realize_once
-from trendline.range_touch import fill_fade
+from stockmind.ledger import fade_score, new_ledger, planned_orders, realize_once
+from stockmind.range_touch import fill_fade
 
 
 def _card(ticker, side, entry, prior, atr):
@@ -53,7 +53,7 @@ def test_realize_is_idempotent():
 
 
 def test_fill_fee_math():
-    from trendline.ibkr_fees import roundtrip_fees
+    from stockmind.ibkr_fees import roundtrip_fees
     filled = fill_fade(-1, 102.0, 100.0, 104.0, 101.0, 102.5, 99.5, 100.5)
     assert filled is not None
     ret, exit_px, reason = filled.ret, filled.exit_px, filled.reason
@@ -66,7 +66,7 @@ def test_fill_fee_math():
 
 
 def test_three_books_same_start():
-    from trendline.ledger import ledger_view, new_ledger
+    from stockmind.ledger import ledger_view, new_ledger
     v = ledger_view(new_ledger())
     eqs = [v["headlines"][f]["equity_hkd"] for f in ("shared", "sector", "stock")]
     assert eqs == [500_000.0, 500_000.0, 500_000.0]
@@ -75,8 +75,8 @@ def test_three_books_same_start():
 
 
 def test_realize_marks_voo_buy_and_hold(monkeypatch):
-    import trendline.ledger as ledger_mod
-    from trendline.ledger import new_ledger, realize_once
+    import stockmind.ledger as ledger_mod
+    from stockmind.ledger import new_ledger, realize_once
 
     cards = {
         "asof": "2026-09-11",
@@ -117,7 +117,7 @@ def test_realize_marks_voo_buy_and_hold(monkeypatch):
 
 
 def test_sync_benchmark_when_asof_already_realized():
-    from trendline.ledger import new_ledger, realize_once, sync_benchmark
+    from stockmind.ledger import new_ledger, realize_once, sync_benchmark
 
     led = new_ledger()
     led["realized_asofs"] = ["2026-09-14"]
@@ -157,8 +157,8 @@ def test_spend_uses_current_equity_not_start():
 
 def test_realize_uses_5m_when_bars_injected(monkeypatch):
     """Inject RTH 5m bars; do not hit Yahoo. Fill path must record fill_source=5m."""
-    import trendline.ledger as ledger_mod
-    from trendline.ledger import new_ledger, realize_once
+    import stockmind.ledger as ledger_mod
+    from stockmind.ledger import new_ledger, realize_once
 
     cards = {
         "asof": "2026-09-11",
@@ -209,8 +209,8 @@ def test_realize_uses_5m_when_bars_injected(monkeypatch):
 
 
 def test_realize_misses_when_5m_missing(monkeypatch):
-    import trendline.ledger as ledger_mod
-    from trendline.ledger import new_ledger, realize_once
+    import stockmind.ledger as ledger_mod
+    from stockmind.ledger import new_ledger, realize_once
 
     cards = {
         "asof": "2026-09-11",
@@ -249,8 +249,8 @@ def test_realize_misses_when_5m_missing(monkeypatch):
 
 
 def test_realize_stores_planned_snapshot(monkeypatch):
-    import trendline.ledger as ledger_mod
-    from trendline.ledger import new_ledger, realize_once
+    import stockmind.ledger as ledger_mod
+    from stockmind.ledger import new_ledger, realize_once
 
     cards = {
         "asof": "2026-09-11",
@@ -296,7 +296,7 @@ def test_skips_poor_mae_rank():
 
 
 def test_locked_open_plan_used_instead_of_recompute(monkeypatch):
-    from trendline.ledger import _locked_plan_rows, new_ledger
+    from stockmind.ledger import _locked_plan_rows, new_ledger
 
     payload = {"asof": "2026-09-16", "cards": []}
     led = new_ledger()
@@ -310,7 +310,7 @@ def test_locked_open_plan_used_instead_of_recompute(monkeypatch):
 
 
 def test_prune_plan_history_keeps_last_three():
-    from trendline.ledger import _prune_plan_history
+    from stockmind.ledger import _prune_plan_history
 
     def day(asof, planned=True):
         rec = {"n_fills": 0}
