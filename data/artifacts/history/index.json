@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "source": "git backfill of cards_*.json unique asof (latest commit per asof)",
+  "asofs": [
+    {
+      "asof": "2026-09-18",
+      "commit": "5222c6fe4336258593e1b09b9da71aca4a200ac6",
+      "generated_at_utc": "2026-09-19T03:17:16Z",
+      "families": {
+        "shared": {
+          "file": "history/2026-09-18/cards_shared.json",
+          "n_cards": 100,
+          "n_long": 0,
+          "n_short": 84,
+          "n_flat": 16
+        },
+        "sector": {
+          "file": "history/2026-09-18/cards_sector.json",
+          "n_cards": 100,
+          "n_long": 23,
+          "n_short": 61,
+          "n_flat": 16
+        },
+        "stock": {
+          "file": "history/2026-09-18/cards_stock.json",
+          "n_cards": 100,
+          "n_long": 16,
+          "n_short": 65,
+          "n_flat": 19
+        }
+      }
+    },
+    {
+      "asof": "2026-09-17",
+      "commit": "7467a6926d66658ce1c888ced1db24ec3f8784d7",
+      "generated_at_utc": "2026-09-18T09:18:06Z",
+      "families": {
+        "shared": {
+          "file": "history/2026-09-17/cards_shared.json",
+          "n_cards": 100,
+          "n_long": 0,
+          "n_short": 83,
+          "n_flat": 17
+        },
+        "sector": {
+          "file": "history/2026-09-17/cards_sector.json",
+          "n_cards": 100,
+          "n_long": 9,
+          "n_short": 74,
+          "n_flat": 17
+        },
+        "stock": {
+          "file": "history/2026-09-17/cards_stock.json",
+          "n_cards": 100,
+          "n_long": 18,
+          "n_short": 59,
+          "n_flat": 23
+        }
+      }
+    },
+    {
+      "asof": "2026-09-16",
+      "commit": "ba453558ccd0bcfece2895813234b8199f5dcd32",
+      "generated_at_utc": "2026-09-17T10:41:40Z",
+      "families": {
+        "shared": {
+          "file": "history/2026-09-16/cards_shared.json",
+          "n_cards": 100,
+          "n_long": 3,
+          "n_short": 81,
+          "n_flat": 16
+        },
+        "sector": {
+          "file": "history/2026-09-16/cards_sector.json",
+          "n_cards": 100,
+          "n_long": 0,
+          "n_short": 4,
+          "n_flat": 96
+        },
+        "stock": {
+          "file": "history/2026-09-16/cards_stock.json",
+          "n_cards": 100,
+          "n_long": 4,
+          "n_short": 0,
+          "n_flat": 96
+        }
+      }
+    },
+    {
+      "asof": "2026-09-15",
+      "commit": "75424f38daa10a31aa257bd0909f0463fcf333d7",
+      "generated_at_utc": "2026-09-16T12:45:38Z",
+      "families": {
+        "shared": {
+          "file": "history/2026-09-15/cards_shared.json",
+          "n_cards": 100,
+          "n_long": 0,
+          "n_short": 73,
+          "n_flat": 27
+        },
+        "sector": {
+          "file": "history/2026-09-15/cards_sector.json",
+          "n_cards": 100,
+          "n_long": 11,
+          "n_short": 7,
+          "n_flat": 82
+        },
+        "stock": {
+          "file": "history/2026-09-15/cards_stock.json",
+          "n_cards": 100,
+          "n_long": 26,
+          "n_short": 3,
+          "n_flat": 71
+        }
+      }
+    },
+    {
+      "asof": "2026-09-14",
+      "commit": "13b4273fad953ebb846403020efaeab278398c49",
+      "generated_at_utc": "2026-09-15T05:09:14Z",
+      "families": {
+        "shared": {
+          "file": "history/2026-09-14/cards_shared.json",
+          "n_cards": 100,
+          "n_long": 33,
+          "n_short": 35,
+          "n_flat": 32
+        },
+        "sector": {
+          "file": "history/2026-09-14/cards_sector.json",
+          "n_cards": 100,
+          "n_long": 7,
+          "n_short": 18,
+          "n_flat": 75
+        },
+        "stock": {
+          "file": "history/2026-09-14/cards_stock.json",
+          "n_cards": 100,
+          "n_long": 35,
+          "n_short": 3,
+          "n_flat": 62
+        }
+      }
+    },
+    {
+      "asof": "2026-09-11",
+      "commit": "cf5d1007592a541ea972dc9e56abc7f7beff1ca7",
+      "generated_at_utc": "2026-09-15T01:29:10Z",
+      "families": {
+        "shared": {
+          "file": "history/2026-09-11/cards_shared.json",
+          "n_cards": 100,
+          "n_long": 0,
+          "n_short": 100,
+          "n_flat": 0
+        },
+        "sector": {
+          "file": "history/2026-09-11/cards_sector.json",
+          "n_cards": 100,
+          "n_long": 18,
+          "n_short": 80,
+          "n_flat": 2
+        },
+        "stock": {
+          "file": "history/2026-09-11/cards_stock.json",
+          "n_cards": 100,
+          "n_long": 22,
+          "n_short": 71,
+          "n_flat": 7
+        }
+      }
+    }
+  ]
+}

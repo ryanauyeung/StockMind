@@ -17,6 +17,7 @@ COPY data/artifacts/cards.json \
      data/artifacts/per_ticker.json \
      data/artifacts/ledger.json \
      data/artifacts/
+COPY data/artifacts/history ./data/artifacts/history
 
 ENV PYTHONPATH=/app/src
 ENV STREAMLIT_SERVER_HEADLESS=true
