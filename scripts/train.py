@@ -9,11 +9,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from trendline.config import MODEL_DIR  # noqa: E402
-from trendline.data.store import load_ohlcv  # noqa: E402
-from trendline.features import build_features  # noqa: E402
-from trendline.models.lightgbm_quantile import QuantileLGBM  # noqa: E402
-from trendline.universe import is_sp500  # noqa: E402
+from stockmind.config import MODEL_DIR  # noqa: E402
+from stockmind.data.store import load_ohlcv  # noqa: E402
+from stockmind.features import build_features  # noqa: E402
+from stockmind.models.lightgbm_quantile import QuantileLGBM  # noqa: E402
+from stockmind.universe import is_sp500  # noqa: E402
 
 
 def main() -> int:

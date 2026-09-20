@@ -9,14 +9,14 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from trendline.config import (
+from stockmind.config import (
     ATR_PERIOD,
     DVOL_Z_WINDOW,
     FEATURE_COLS,
     PARKINSON_WINDOW,
     SECTOR_ETF,
 )
-from trendline.universe import sector_map
+from stockmind.universe import sector_map
 
 
 def _rolling_mean(s: pd.Series, window: int) -> pd.Series:

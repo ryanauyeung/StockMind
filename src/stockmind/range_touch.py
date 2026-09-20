@@ -20,7 +20,7 @@ import numpy as np
 
 import pandas as pd
 
-from trendline.config import (
+from stockmind.config import (
     ATR_SL_MULT,
     CLOSE_GATE_MIN_RET,
     FADE_MIN_ATR,

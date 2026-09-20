@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 
-from trendline.config import (
+from stockmind.config import (
     ARTIFACT_DIR,
     FADE_MIN_ATR,
     CLOSE_GATE_FAMILIES,
@@ -23,11 +23,11 @@ from trendline.config import (
     MAE_RANK_W_LOW,
     recent_close_error_path,
 )
-from trendline.range_touch import FadeSetup, choose_setup
-from trendline.models.baseline import BaselineModel
-from trendline.models.families import SectorBundle, SharedBundle, StockBundle, pred_col
-from trendline.models.lightgbm_quantile import QuantileLGBM
-from trendline.universe import load_sp500, rank_by_dollar_volume
+from stockmind.range_touch import FadeSetup, choose_setup
+from stockmind.models.baseline import BaselineModel
+from stockmind.models.families import SectorBundle, SharedBundle, StockBundle, pred_col
+from stockmind.models.lightgbm_quantile import QuantileLGBM
+from stockmind.universe import load_sp500, rank_by_dollar_volume
 
 SOURCE_LABEL = {
     "yfinance": "Yahoo Finance",

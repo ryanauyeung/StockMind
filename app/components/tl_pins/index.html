@@ -6,7 +6,7 @@
 </head>
 <body>
 <script>
-  const KEY = "trendline_pinned";
+  const KEY = "stockmind_pinned";
   let lastNonce = null;
   function sendMessage(type, data) {
     parent.postMessage(Object.assign({ isStreamlitMessage: true, type: type }, data || {}), "*");

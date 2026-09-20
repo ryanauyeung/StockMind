@@ -8,7 +8,7 @@ import lightgbm as lgb
 import numpy as np
 import pandas as pd
 
-from trendline.config import (
+from stockmind.config import (
     FEATURE_COLS,
     LGB_EARLY_STOPPING,
     LGB_N_ESTIMATORS,

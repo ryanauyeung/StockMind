@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from trendline.config import OHLCV_PATH, PARQUET_DIR
+from stockmind.config import OHLCV_PATH, PARQUET_DIR
 
 OHLCV_COLS = ["date", "ticker", "open", "high", "low", "close", "adj_close", "volume", "source"]
 
@@ -87,7 +87,7 @@ def equity_session_coverage(ohlcv: pd.DataFrame, session: pd.Timestamp | str | N
 
     Used to refuse cards/ledger when Yahoo only published macros / NaN-close stubs.
     """
-    from trendline.universe import load_sp500
+    from stockmind.universe import load_sp500
 
     df = ohlcv.copy()
     df["date"] = pd.to_datetime(df["date"]).dt.tz_localize(None).dt.normalize()

@@ -14,9 +14,9 @@ from typing import Protocol
 import pandas as pd
 import requests
 
-from trendline.data.store import OHLCV_COLS
+from stockmind.data.store import OHLCV_COLS
 
-_UA = {"User-Agent": "trendline/0.1 (research; +https://github.com/Kk-KelvinLam/trendline)"}
+_UA = {"User-Agent": "stockmind/0.1 (research; +https://github.com/ryanauyeung/StockMind)"}
 
 
 class DataProvider(Protocol):

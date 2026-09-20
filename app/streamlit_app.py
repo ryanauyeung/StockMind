@@ -18,7 +18,7 @@ except ImportError:  # pragma: no cover
     st_keyup = None
 
 
-from trendline.config import (
+from stockmind.config import (
     ARTIFACT_DIR,
     CARDS_PATH,
     CARDS_SECTOR_PATH,
@@ -28,11 +28,11 @@ from trendline.config import (
     SCOREBOARD_PATH,
     LEDGER_PATH,
 )
-from trendline.ledger import ledger_view
+from stockmind.ledger import ledger_view
 from components.tl_widgets import pins_bridge
 
 
-st.set_page_config(page_title="Trendline · 美股翌日預測", page_icon="📈", layout="wide")
+st.set_page_config(page_title="StockMind · 美股翌日預測", page_icon="📈", layout="wide")
 
 DISCLAIMER = "本頁為量化模型輸出，並非投資建議。過往回測不代表未來表現。Model output, not investment advice."
 
@@ -343,7 +343,7 @@ button[kind="tertiary"] {
       e.stopPropagation();
       var t = (a.getAttribute("data-ticker") || "").toUpperCase();
       if (!t) return;
-      var key = "trendline_pinned";
+      var key = "stockmind_pinned";
       var pins = [];
       try {{ pins = JSON.parse(win.localStorage.getItem(key) || "[]"); }} catch (err) {{ pins = []; }}
       if (!Array.isArray(pins)) pins = [];
@@ -375,7 +375,7 @@ button[kind="tertiary"] {
 def main() -> None:
     _sync_pins_storage()
     _ensure_pinned_state()
-    st.title("Trendline")
+    st.title("StockMind")
     st.caption("美股收市後 · 盤中觸價淡區間（止盈前收）。S&P 500 全數訓練 / 顯示當日成交額最大 100 隻；入書另要全市場 MAE 排名 ≤ 200")
     st.warning(DISCLAIMER)
 

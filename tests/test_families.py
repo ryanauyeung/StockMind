@@ -5,9 +5,9 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from trendline.config import FEATURE_COLS, STOCK_MIN_TRAIN_ROWS
-from trendline.models.families import SectorBundle, SharedBundle, StockBundle, pred_col
-from trendline.universe import large_sectors, model_sector_for, model_sector_map, sector_map
+from stockmind.config import FEATURE_COLS, STOCK_MIN_TRAIN_ROWS
+from stockmind.models.families import SectorBundle, SharedBundle, StockBundle, pred_col
+from stockmind.universe import large_sectors, model_sector_for, model_sector_map, sector_map
 
 
 def _toy_ready(n_dates: int, tickers: list[str], seed: int = 0) -> pd.DataFrame:

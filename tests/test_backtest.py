@@ -3,8 +3,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from trendline.backtest import _fill_long, _fill_short, walk_forward_folds
-from trendline.metrics import coverage, mae, mape, rmse, trade_stats
+from stockmind.backtest import _fill_long, _fill_short, walk_forward_folds
+from stockmind.metrics import coverage, mae, mape, rmse, trade_stats
 
 
 def test_mae_rmse_known_values():

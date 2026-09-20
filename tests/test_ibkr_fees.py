@@ -1,4 +1,4 @@
-from trendline.ibkr_fees import commission, order_fees, roundtrip_fees
+from stockmind.ibkr_fees import commission, order_fees, roundtrip_fees
 
 
 def test_ib_fixed_examples():

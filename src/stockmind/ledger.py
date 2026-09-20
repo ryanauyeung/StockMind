@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from trendline.config import (
+from stockmind.config import (
     ARTIFACT_DIR,
     CARDS_SECTOR_PATH,
     CARDS_SHARED_PATH,
@@ -35,10 +35,10 @@ from trendline.config import (
     PAPER_PLAN_HISTORY_DAYS,
     PAPER_STARTING_HKD,
 )
-from trendline.data.intraday import fetch_rth_5m
-from trendline.data.store import load_ohlcv
-from trendline.ibkr_fees import roundtrip_fees
-from trendline.range_touch import FillResult, fill_fade_bars
+from stockmind.data.intraday import fetch_rth_5m
+from stockmind.data.store import load_ohlcv
+from stockmind.ibkr_fees import roundtrip_fees
+from stockmind.range_touch import FillResult, fill_fade_bars
 
 FAMILY_PATHS = {
     "shared": CARDS_SHARED_PATH,

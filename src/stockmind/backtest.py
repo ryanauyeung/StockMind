@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from trendline.config import (
+from stockmind.config import (
     CLOSE_GATE_FAMILIES,
     FEATURE_COLS,
     MAX_POSITIONS,
@@ -18,10 +18,10 @@ from trendline.config import (
     WF_PURGE_DAYS,
     WF_TEST_DAYS,
 )
-from trendline.metrics import directional_accuracy, forecast_block, trade_stats
-from trendline.models.baseline import BaselineModel
-from trendline.models.families import SectorBundle, SharedBundle, StockBundle, pred_col, rename_preds
-from trendline.universe import is_sp500
+from stockmind.metrics import directional_accuracy, forecast_block, trade_stats
+from stockmind.models.baseline import BaselineModel
+from stockmind.models.families import SectorBundle, SharedBundle, StockBundle, pred_col, rename_preds
+from stockmind.universe import is_sp500
 
 
 @dataclass
@@ -347,7 +347,7 @@ def simulate_trades(
 
     Gate on High/Low beating ATR (beats_range), not Close direction.
     """
-    from trendline.range_touch import choose_setup, fill_fade
+    from stockmind.range_touch import choose_setup, fill_fade
 
     beat_col = "beats_range" if "beats_range" in per_ticker.columns else "beats_baseline"
     beat = dict(zip(per_ticker["ticker"], per_ticker[beat_col], strict=False))

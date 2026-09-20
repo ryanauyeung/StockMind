@@ -8,15 +8,15 @@ from pathlib import Path
 
 import pandas as pd
 
-from trendline.backtest import (
+from stockmind.backtest import (
     build_scoreboard,
     evaluate_family,
     run_walk_forward,
     simulate_trades,
     summarize_backtest,
 )
-from trendline.cards import FamilyPredictor, build_all_family_cards, build_cards
-from trendline.config import (
+from stockmind.cards import FamilyPredictor, build_all_family_cards, build_cards
+from stockmind.config import (
     ARTIFACT_DIR,
     CARDS_PATH,
     CARDS_SECTOR_PATH,
@@ -31,10 +31,10 @@ from trendline.config import (
     OOS_PATH,
     SCOREBOARD_PATH,
 )
-from trendline.data.store import load_ohlcv, summarize
-from trendline.features import build_features
-from trendline.models.families import SectorBundle, SharedBundle, StockBundle
-from trendline.universe import is_sp500
+from stockmind.data.store import load_ohlcv, summarize
+from stockmind.features import build_features
+from stockmind.models.families import SectorBundle, SharedBundle, StockBundle
+from stockmind.universe import is_sp500
 
 
 def _jsonable(obj):
@@ -57,7 +57,7 @@ def _write_cards(path: Path, payload: dict) -> None:
 
 def _persist_open_plan() -> None:
     try:
-        from trendline.ledger import load_ledger, save_ledger, snapshot_open_plan
+        from stockmind.ledger import load_ledger, save_ledger, snapshot_open_plan
 
         save_ledger(snapshot_open_plan(load_ledger()))
     except Exception as exc:

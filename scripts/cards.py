@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from trendline.pipeline import refresh_cards_from_saved_models  # noqa: E402
+from stockmind.pipeline import refresh_cards_from_saved_models  # noqa: E402
 
 
 def main() -> int:

@@ -9,7 +9,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from trendline.config import BASELINE_ATR_K
+from stockmind.config import BASELINE_ATR_K
 
 
 class BaselineModel:

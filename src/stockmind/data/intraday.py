@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from trendline.config import ARTIFACT_DIR
+from stockmind.config import ARTIFACT_DIR
 
 NY = ZoneInfo("America/New_York")
 RTH_START = time(9, 30)

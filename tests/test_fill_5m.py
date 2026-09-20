@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from trendline.range_touch import fill_fade_bars
+from stockmind.range_touch import fill_fade_bars
 
 
 def _bars(*rows):

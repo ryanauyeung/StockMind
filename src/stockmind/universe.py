@@ -7,7 +7,7 @@ from functools import lru_cache
 
 import pandas as pd
 
-from trendline.config import (
+from stockmind.config import (
     MACRO_TICKERS,
     SECTOR_ETF,
     SECTOR_MIN_NAMES,

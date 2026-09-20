@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "trendline"
+name = "stockmind"
 version = "0.1.0"
 description = "Post-US-close next-day S&P 500 high/low/close forecast dashboard"
 readme = "README.md"

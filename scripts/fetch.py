@@ -15,16 +15,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from trendline.config import OHLCV_PATH  # noqa: E402
-from trendline.data.providers import CombinedProvider  # noqa: E402
-from trendline.data.store import (  # noqa: E402
+from stockmind.config import OHLCV_PATH  # noqa: E402
+from stockmind.data.providers import CombinedProvider  # noqa: E402
+from stockmind.data.store import (  # noqa: E402
     delta_start,
     load_ohlcv,
     merge_ohlcv,
     save_ohlcv,
     summarize,
 )
-from trendline.universe import default_fetch_tickers  # noqa: E402
+from stockmind.universe import default_fetch_tickers  # noqa: E402
 
 
 def main() -> int:

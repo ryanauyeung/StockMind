@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from trendline.config import (
+from stockmind.config import (
     MODEL_SECTOR_DIR,
     MODEL_SHARED_DIR,
     MODEL_STOCK_DIR,
@@ -20,8 +20,8 @@ from trendline.config import (
     STOCK_N_ESTIMATORS,
     TARGETS,
 )
-from trendline.models.lightgbm_quantile import QuantileLGBM
-from trendline.universe import model_sector_for, model_sector_map
+from stockmind.models.lightgbm_quantile import QuantileLGBM
+from stockmind.universe import model_sector_for, model_sector_map
 
 
 def pred_col(target: str, q: float, family: str | None = None) -> str:

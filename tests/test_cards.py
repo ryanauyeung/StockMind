@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from trendline.cards import _last_bar_dates, build_cards
+from stockmind.cards import _last_bar_dates, build_cards
 
 
 class _StubModel:
@@ -98,7 +98,7 @@ def test_build_cards_last_bar_date_when_ohlcv_stops_early(monkeypatch):
             "dollar_volume": [1e9, 9e8],
         }
     )
-    monkeypatch.setattr("trendline.cards.rank_by_dollar_volume", lambda *a, **k: ranked)
+    monkeypatch.setattr("stockmind.cards.rank_by_dollar_volume", lambda *a, **k: ranked)
 
     per_ticker = pd.DataFrame(
         {"ticker": ["AAPL", "MSFT"], "beats_range": [False, False]}
