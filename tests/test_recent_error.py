@@ -1,9 +1,9 @@
-from trendline.cards import _recent_error
+from stockmind.cards import _recent_error
 
 
 def test_walk_forward_fallback_when_oos_missing(monkeypatch):
     # Ignore on-disk recent_close_error_*.json so we exercise the WF fallback path.
-    monkeypatch.setattr("trendline.cards._load_recent_error_artifact", lambda family="shared": {})
+    monkeypatch.setattr("stockmind.cards._load_recent_error_artifact", lambda family="shared": {})
     out = _recent_error(
         None,
         "AAPL",
@@ -16,8 +16,8 @@ def test_walk_forward_fallback_when_oos_missing(monkeypatch):
     assert abs(out["mae_close_ret"] - 0.02) < 1e-12
     assert abs(out["mae_close_px"] - 2.0) < 1e-12
 
-from trendline.range_touch import FadeSetup
-from trendline.cards import _apply_recent_mae_decision, _recent_error
+from stockmind.range_touch import FadeSetup
+from stockmind.cards import _apply_recent_mae_decision, _recent_error
 
 
 def test_apply_recent_mae_flattens_when_too_high():
@@ -56,7 +56,7 @@ def test_recent_lookup_preferred():
     assert err["n"] == 20
 
 
-from trendline.cards import _mae_score, compute_recent_close_errors, rank_by_recent_mae
+from stockmind.cards import _mae_score, compute_recent_close_errors, rank_by_recent_mae
 import pandas as pd
 
 
