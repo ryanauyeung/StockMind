@@ -1,4 +1,4 @@
-from trendline.range_touch import choose_setup, fill_fade, gapped_through
+from stockmind.range_touch import choose_setup, fill_fade, gapped_through
 
 
 def test_picks_side_with_more_room():
