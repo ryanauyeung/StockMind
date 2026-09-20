@@ -1,4 +1,4 @@
-# Trendline
+# StockMind
 
 Post-US-close dashboard that forecasts the **next regular session** High / Low / Close for S&P 500 names.
 
@@ -127,7 +127,7 @@ High/Low: all three families beat the ATR baseline by a wide margin. Close remai
 ## Layout
 
 ```
-src/trendline/     universe, data, features, models (shared/sector/stock), backtest, cards
+src/stockmind/     universe, data, features, models (shared/sector/stock), backtest, cards
 app/               Streamlit dashboard (zh-HK)
 scripts/           fetch, train, backtest, cards, nightly, run_pipeline
 data/universe/     S&P 500 ticker list
