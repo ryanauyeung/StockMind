@@ -109,3 +109,4 @@ def equity_session_coverage(ohlcv: pd.DataFrame, session: pd.Timestamp | str | N
         "frac": frac,
         "complete": frac >= 0.90,
     }
+
