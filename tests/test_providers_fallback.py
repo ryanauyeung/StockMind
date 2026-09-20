@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from trendline.data.providers import CombinedProvider, _normalize_yf_frame
-from trendline.data.store import equity_session_coverage
+from stockmind.data.providers import CombinedProvider, _normalize_yf_frame
+from stockmind.data.store import equity_session_coverage
 
 
 def _bars(ticker: str, dates: list[str], source: str = "yfinance") -> pd.DataFrame:
