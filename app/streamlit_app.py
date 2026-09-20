@@ -28,6 +28,16 @@ from stockmind.config import (
     SCOREBOARD_PATH,
     LEDGER_PATH,
 )
+
+from stockmind.history_cards import (
+    attach_actuals,
+    family_has_asof,
+    fetch_session_ohlc,
+    list_available_asofs,
+    load_history_cards,
+    nearby_asofs,
+    next_session_after,
+)
 from stockmind.ledger import ledger_view
 from components.tl_widgets import pins_bridge
 
@@ -372,6 +382,115 @@ button[kind="tertiary"] {
 
 
 
+
+def _resolve_cards_payload(
+    family: str, cards_path: Path, selected_asof: str | None
+) -> tuple[dict | None, bool, str | None]:
+    """Return (payload, is_history, miss_reason). Never silent-fallback when historical asof missing."""
+    live = _load_json(cards_path) or (_load_json(CARDS_PATH) if family == "shared" else None)
+    live_asof = (live or {}).get("asof")
+    if not selected_asof:
+        return live, False, None
+    selected = str(selected_asof)
+    if live_asof and selected == str(live_asof):
+        return live, False, None
+    if family_has_asof(family, selected):
+        return load_history_cards(family, selected), True, None
+    fam_zh = dict(FAMILY_LABELS).get(family, family)
+    return None, True, f"呢個 asof 未有 {fam_zh} 卡片檔"
+
+
+def _render_asof_controls(include_actuals_toggle: bool = True) -> tuple[str | None, bool]:
+    """Shared asof selectbox + optional actuals toggle. Keys: cards_asof, cards_show_actuals."""
+    options = list_available_asofs()
+    if not options:
+        st.caption("尚未建立 history asof 快照。")
+        show = False
+        if include_actuals_toggle:
+            show = st.checkbox(
+                "對照下一交易日實際價（Yahoo）",
+                value=False,
+                key="cards_show_actuals",
+                help="對照用 Yahoo 下一交易日 OHLC，僅作事後追蹤，並非績效保證。",
+            )
+        return None, bool(show)
+
+    if "cards_asof" not in st.session_state or st.session_state["cards_asof"] not in options:
+        st.session_state["cards_asof"] = options[0]
+    if include_actuals_toggle and "cards_show_actuals" not in st.session_state:
+        st.session_state["cards_show_actuals"] = False
+
+    if include_actuals_toggle:
+        pick_col, act_col = st.columns([2, 2])
+        with pick_col:
+            st.selectbox(
+                "資料截止 (asof)",
+                options,
+                key="cards_asof",
+                help="只顯示已存檔嘅預測日",
+            )
+        with act_col:
+            show_actuals = st.checkbox(
+                "對照下一交易日實際價（Yahoo）",
+                key="cards_show_actuals",
+                help="對照用 Yahoo 下一交易日 OHLC，僅作事後追蹤，並非績效保證。",
+            )
+    else:
+        st.selectbox(
+            "資料截止 (asof)",
+            options,
+            key="cards_asof",
+            help="只顯示已存檔嘅預測日",
+        )
+        show_actuals = False
+    return st.session_state.get("cards_asof"), bool(show_actuals)
+
+
+def _render_missing_asof(family: str, asof: str, options: list[str]) -> None:
+    fam_zh = dict(FAMILY_LABELS).get(family, family)
+    st.warning(f"呢個 asof 未有 {fam_zh} 卡片檔")
+    near = nearby_asofs(asof, options, k=2)
+    bits = []
+    if near.get("newer"):
+        bits.append("較新：" + "、".join(near["newer"]))
+    if near.get("older"):
+        bits.append("較舊：" + "、".join(near["older"]))
+    if bits:
+        st.caption("附近日期 · " + "　·　".join(bits))
+    if options and st.button("跳去最新", key=f"jump_latest_{family}_{asof}"):
+        st.session_state["cards_asof"] = options[0]
+        st.rerun()
+
+
+def _enrich_cards_with_actuals(cards: list[dict], asof: str, enabled: bool) -> list[dict]:
+    if not enabled or not asof or not cards:
+        return cards
+    # Cache next session per run via session_state
+    cache_key = f"_actuals_session_{asof}"
+    session = st.session_state.get(cache_key)
+    out = []
+    # Resolve next session once using first ticker with Yahoo history
+    if session is None:
+        for c in cards[:8]:
+            t = str(c.get("ticker") or "")
+            if not t:
+                continue
+            ns = next_session_after(asof, t)
+            if ns is not None:
+                session = ns.strftime("%Y-%m-%d")
+                st.session_state[cache_key] = session
+                break
+    if not session:
+        return cards
+    px_cache = st.session_state.setdefault(f"_actuals_px_{session}", {})
+    for c in cards:
+        t = str(c.get("ticker") or "").upper()
+        if t not in px_cache:
+            px_cache[t] = fetch_session_ohlc(t, session)
+        out.append(attach_actuals(c, px_cache.get(t)))
+    return out
+
+
 def main() -> None:
     _sync_pins_storage()
     _ensure_pinned_state()
@@ -398,7 +517,14 @@ def main() -> None:
         _render_pinned()
         return
 
-    cards_payload = _load_json(cards_path) or ( _load_json(CARDS_PATH) if key == "shared" else None )
+    asof_options = list_available_asofs()
+    selected_asof, show_actuals = _render_asof_controls(include_actuals_toggle=True)
+    cards_payload, is_history, miss_reason = _resolve_cards_payload(key, cards_path, selected_asof)
+
+    if miss_reason:
+        _render_missing_asof(key, str(selected_asof or ""), asof_options)
+        st.stop()
+
     if cards_payload is None or metrics is None:
         st.error(
             "尚未找到回測產物。請先在專案根目錄執行：\n\n"
@@ -407,12 +533,21 @@ def main() -> None:
         )
         st.stop()
 
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("資料截止", cards_payload.get("asof", "—"))
-    c2.metric("預測對象", cards_payload.get("next_session", "下一常規時段"))
-    c3.metric("做多", cards_payload.get("n_long", 0))
-    c4.metric("做空 / 觀望", f"{cards_payload.get('n_short', 0)} / {cards_payload.get('n_flat', 0)}")
-    st.caption(f"模型家族：{cards_payload.get('model_family_zh') or page}")
+    newest = asof_options[0] if asof_options else None
+    viewing_asof = str(cards_payload.get("asof") or selected_asof or "")
+    next_session = cards_payload.get("next_session") or "下一常規時段"
+    if newest and viewing_asof and viewing_asof != str(newest):
+        st.caption(
+            f"你正睇緊 asof **{viewing_asof}** 嘅預測（預測對象：{next_session}），唔係即時訊號。"
+        )
+    if show_actuals:
+        st.caption("對照用 Yahoo 下一交易日 OHLC，僅作事後追蹤，並非績效保證。")
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("預測對象", next_session)
+    c2.metric("做多", cards_payload.get("n_long", 0))
+    c3.metric("做空 / 觀望", f"{cards_payload.get('n_short', 0)} / {cards_payload.get('n_flat', 0)}")
+    st.caption(f"模型家族：{cards_payload.get('model_family_zh') or page}　·　asof {viewing_asof or '—'}")
     if key == "shared":
         st.caption(
             "現有規則（共用）：淡區間入場，無 Close q50 方向閘。"
@@ -457,7 +592,16 @@ def main() -> None:
     elif filt == "高信心":
         cards = [c for c in cards if c.get("high_confidence")]
 
-    st.subheader("翌日交易卡")
+    if show_actuals:
+        with st.spinner("載入下一交易日實際價…"):
+            cards = _enrich_cards_with_actuals(cards, str(cards_payload.get("asof") or ""), True)
+        sess = st.session_state.get(f"_actuals_session_{cards_payload.get('asof')}")
+        if sess:
+            st.caption(f"實際價對照 session：**{sess}**（Yahoo；失敗嘅票會略過）")
+        else:
+            st.warning("暫時搵唔到 asof 之後嘅交易日（或 Yahoo 不可用）。")
+
+    st.subheader("翌日交易卡" + (" · 含實際價對照" if show_actuals else ""))
     if not cards:
         st.info("此篩選沒有卡片。" if not (search_q or "").strip() else "搜尋／篩選沒有符合嘅卡片。")
     else:
@@ -1019,6 +1163,36 @@ def _render_card(card: dict, *, family: str = "shared") -> None:
         f"低 {_fmt_px(p.get('low', {}).get('q50'))}　"
         f"收 {_fmt_px(p.get('close', {}).get('q50'))}"
     )
+    actual = card.get("actual")
+    marks = card.get("actual_marks") or {}
+    if actual or marks:
+        st.caption(
+            f"對照標記　H帶 {marks.get('high_in_band', '—')}　"
+            f"L帶 {marks.get('low_in_band', '—')}　"
+            f"入場觸價 {marks.get('entry_touch', '—')}"
+        )
+        with st.expander("實際價明細", expanded=False):
+            if not actual:
+                st.caption("未有 Yahoo OHLC。")
+            else:
+                err = card.get("actual_err") or {}
+                st.write(
+                    f"session **{actual.get('session') or '—'}**　·　"
+                    f"O {_fmt_px(actual.get('open'))}　"
+                    f"H {_fmt_px(actual.get('high'))}　"
+                    f"L {_fmt_px(actual.get('low'))}　"
+                    f"C {_fmt_px(actual.get('close'))}"
+                )
+                close_err = err.get("close")
+                close_pct = err.get("close_pct")
+                pct_txt = _fmt_pct(close_pct) if close_pct is not None else "—"
+                st.caption(
+                    f"Close vs q50　{_fmt_px(close_err)}　（{pct_txt}）"
+                )
+                st.caption(
+                    "圖例：H/L 帶 = 實際高／低是否落喺預測 q10–q90；"
+                    "入場觸價 = 做多 Low≤入場／做空 High≥入場；✓／✗／—"
+                )
     st.caption(
         f"收市 q10/q50/q90：{_fmt_px(p.get('close', {}).get('q10'))} / "
         f"{_fmt_px(p.get('close', {}).get('q50'))} / {_fmt_px(p.get('close', {}).get('q90'))}　"
@@ -1080,11 +1254,44 @@ def _render_pinned() -> None:
     st.subheader("釘選對照 · 三族模型並排")
     st.caption("喺共用／行業／個股頁面 Pin 股票，或喺下面直接輸入代號加入。對照行動、入場、止盈止損同預測中位。")
 
-    payloads = {
-        "shared": _load_json(CARDS_SHARED_PATH) or _load_json(CARDS_PATH),
-        "sector": _load_json(CARDS_SECTOR_PATH),
-        "stock": _load_json(CARDS_STOCK_PATH),
+    asof_options = list_available_asofs()
+    selected_asof, show_actuals = _render_asof_controls(include_actuals_toggle=True)
+    path_by_fam = {
+        "shared": CARDS_SHARED_PATH,
+        "sector": CARDS_SECTOR_PATH,
+        "stock": CARDS_STOCK_PATH,
     }
+    payloads: dict[str, dict | None] = {}
+    for fam, _label in FAMILY_LABELS:
+        payload, _is_hist, miss = _resolve_cards_payload(fam, path_by_fam[fam], selected_asof)
+        if miss:
+            _render_missing_asof(fam, str(selected_asof or ""), asof_options)
+            payloads[fam] = None
+        else:
+            payloads[fam] = payload
+    newest = asof_options[0] if asof_options else None
+    if newest and selected_asof and str(selected_asof) != str(newest):
+        # Prefer next_session from first available payload
+        ns = "下一常規時段"
+        for fam, _ in FAMILY_LABELS:
+            p = payloads.get(fam) or {}
+            if p.get("next_session"):
+                ns = p["next_session"]
+                break
+        st.caption(
+            f"你正睇緊 asof **{selected_asof}** 嘅預測（預測對象：{ns}），唔係即時訊號。"
+        )
+    if show_actuals:
+        st.caption("對照用 Yahoo 下一交易日 OHLC，僅作事後追蹤，並非績效保證。")
+        for fam, _ in FAMILY_LABELS:
+            p = payloads.get(fam)
+            if not p:
+                continue
+            cards = _enrich_cards_with_actuals(
+                list(p.get("cards") or []), str(p.get("asof") or selected_asof or ""), True
+            )
+            payloads[fam] = dict(p)
+            payloads[fam]["cards"] = cards
     indexes = {fam: _card_index_by_ticker(payloads.get(fam)) for fam, _ in FAMILY_LABELS}
 
     if st.session_state.pop("_clear_pinned_add", False):

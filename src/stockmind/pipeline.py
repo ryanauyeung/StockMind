@@ -16,6 +16,7 @@ from stockmind.backtest import (
     summarize_backtest,
 )
 from stockmind.cards import FamilyPredictor, build_all_family_cards, build_cards
+from stockmind.history_cards import snapshot_cards_to_history
 from stockmind.config import (
     ARTIFACT_DIR,
     CARDS_PATH,
@@ -168,6 +169,7 @@ def run(ohlcv: pd.DataFrame | None = None) -> dict:
     _write_cards(CARDS_SECTOR_PATH, cards_by_family["sector"])
     _write_cards(CARDS_STOCK_PATH, cards_by_family["stock"])
     _write_cards(CARDS_PATH, cards_by_family["shared"])  # backward compat
+    snapshot_cards_to_history(cards_by_family)
     _persist_open_plan()
 
     METRICS_PATH.write_text(json.dumps(_jsonable(metrics), ensure_ascii=False, indent=2), encoding="utf-8")
@@ -227,7 +229,8 @@ def refresh_cards_from_saved_models(ohlcv: pd.DataFrame | None = None) -> dict[s
     _write_cards(CARDS_SHARED_PATH, cards_by_family["shared"])
     _write_cards(CARDS_SECTOR_PATH, cards_by_family["sector"])
     _write_cards(CARDS_STOCK_PATH, cards_by_family["stock"])
-    _write_cards(CARDS_PATH, cards_by_family["shared"])
+    _write_cards(CARDS_PATH, cards_by_family["shared"])  # backward compat
+    snapshot_cards_to_history(cards_by_family)
     _persist_open_plan()
     return cards_by_family
 
