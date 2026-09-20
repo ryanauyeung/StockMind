@@ -1,6 +1,6 @@
 import pandas as pd
 
-from trendline.data.store import delta_start, merge_ohlcv
+from stockmind.data.store import delta_start, merge_ohlcv
 
 
 def _bar(date, ticker="AAA", close=10.0):

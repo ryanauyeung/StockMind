@@ -3,8 +3,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from trendline.config import FEATURE_COLS
-from trendline.features import assert_no_future_in_features, build_features
+from stockmind.config import FEATURE_COLS
+from stockmind.features import assert_no_future_in_features, build_features
 
 
 def test_features_do_not_use_next_day(toy_ohlcv):

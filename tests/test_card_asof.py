@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from trendline.cards import latest_card_asof
+from stockmind.cards import latest_card_asof
 
 
 def test_latest_card_asof_skips_vix_only_thin_day():
