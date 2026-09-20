@@ -1,1 +1,1 @@
-"""Custom Streamlit widgets for Trendline dashboard."""
+"""Custom Streamlit widgets for StockMind dashboard."""
