@@ -28,7 +28,7 @@ def fetch_sp500(today: date | None = None) -> "object":
 
     r = requests.get(
         WIKI,
-        headers={"User-Agent": "trendline/0.2 (research; +https://github.com/Kk-KelvinLam/trendline)"},
+        headers={"User-Agent": "stockmind/0.2 (research; +https://github.com/ryanauyeung/StockMind)"},
         timeout=30,
     )
     r.raise_for_status()

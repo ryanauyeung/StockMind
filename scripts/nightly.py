@@ -20,14 +20,14 @@ def _run(script: str, extra: list[str] | None = None) -> int:
 
 
 def _refresh_cards() -> int:
-    from trendline.config import (
+    from stockmind.config import (
         ARTIFACT_DIR,
         METRICS_PATH,
         MODEL_SECTOR_DIR,
         MODEL_SHARED_DIR,
         MODEL_STOCK_DIR,
     )
-    from trendline.pipeline import refresh_cards_from_saved_models
+    from stockmind.pipeline import refresh_cards_from_saved_models
 
     per_ok = (ARTIFACT_DIR / "per_ticker.json").exists()
     models_ok = (
@@ -76,7 +76,7 @@ def main() -> int:
     if rc != 0:
         return rc
 
-    from trendline.data.store import equity_session_coverage, load_ohlcv
+    from stockmind.data.store import equity_session_coverage, load_ohlcv
 
     cov = equity_session_coverage(load_ohlcv())
     print(
@@ -93,7 +93,7 @@ def main() -> int:
         return 0
 
     try:
-        from trendline.ledger import update_ledger
+        from stockmind.ledger import update_ledger
 
         update_ledger()
     except Exception as exc:
@@ -103,7 +103,7 @@ def main() -> int:
     else:
         rc = _refresh_cards()
     try:
-        from trendline.ledger import load_ledger, save_ledger, snapshot_open_plan
+        from stockmind.ledger import load_ledger, save_ledger, snapshot_open_plan
 
         save_ledger(snapshot_open_plan(load_ledger()))
         print("wrote ledger open_plan from current cards", flush=True)
