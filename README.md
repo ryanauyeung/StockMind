@@ -92,7 +92,7 @@ Model dumps under `data/artifacts/models/` are **tracked** (needed for weekday n
 | 11:15 UTC / 19:15 HKT Sunday | Three-family walk-forward retrain. **First Sunday of the month:** refresh S&P list + **full** OHLCV pull and commit the single parquet (housekeep: ~12 blobs/year). Other Sundays keep delta and skip the parquet commit. |
 | Actions → Nightly cards → Run workflow | Manual, optional full retrain |
 
-The workflow file still checks out and pushes `feat/v1-dashboard`. Dashboard code already lives on `main`; until that ref is flipped, weekday card/ledger commits may not land on the deployed branch.
+The workflow checks out and pushes `main`, where the dashboard code lives, so weekday card/ledger commits land on the deployed branch.
 
 No market-data API key. Yahoo first, Stooq fallback.
 
