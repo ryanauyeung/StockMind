@@ -24,10 +24,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout dashboard branch
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: feat/v1-dashboard
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -84,4 +84,4 @@ jobs:
             exit 0
           fi
           git commit -m "chore: nightly cards $(date -u +%F)"
-          git push origin feat/v1-dashboard
+          git push origin main
