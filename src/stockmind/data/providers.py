@@ -14,6 +14,7 @@ from typing import Protocol
 import pandas as pd
 import requests
 
+from stockmind.data.nyse_session import last_complete_nyse_session
 from stockmind.data.store import OHLCV_COLS
 
 _UA = {"User-Agent": "stockmind/0.1 (research; +https://github.com/ryanauyeung/StockMind)"}
@@ -216,11 +217,16 @@ class CombinedProvider:
     stooq: StooqProvider = field(default_factory=StooqProvider)
 
     def download(self, tickers: list[str], start: str, end: str | None = None) -> pd.DataFrame:
-        """Yahoo first; Stooq for tickers missing entirely *or* missing the end session.
+        """Yahoo first; Stooq for tickers missing entirely *or* behind last complete NYSE session.
 
-        Yahoo rate limits often return a partial panel (e.g. only ^VIX on the
-        newest day). Treating any historical rows as success skipped Stooq and
-        left equities stuck on an older asof.
+        Coverage is judged against ``last_complete_nyse_session()``, not Yahoo's
+        panel max. Yahoo often publishes a sparse newest day (e.g. only ^VIX)
+        while equities still only have the prior cash session; requiring every
+        ticker to reach ``panel_max`` caused mass Stooq fallback.
+
+        A ticker is covered when its max bar date >= the NYSE coverage target.
+        Still-missing names get a single-ticker Yahoo retry, then Stooq — both
+        judged against the same target.
         """
         frames: list[pd.DataFrame] = []
         y = _empty()
@@ -231,30 +237,27 @@ class CombinedProvider:
         except Exception as exc:
             print(f"[combined] yfinance failed: {exc}")
 
-        end_ts = pd.Timestamp(end).normalize() if end else pd.Timestamp.today().normalize()
-        # yfinance end is exclusive-ish; treat "as of end-1 calendar day" as OK when end is tomorrow
-        # Callers pass end=None or next-day ISO; require max(date) >= start and cover latest requested day when end set.
+        target = last_complete_nyse_session().normalize()
         covered: set[str] = set()
+        panel_max = None
         if not y.empty:
             y2 = y.copy()
             y2["date"] = pd.to_datetime(y2["date"]).dt.tz_localize(None).dt.normalize()
-            # When end is given as exclusive next day (fetch.py), last session is end-1 trading day;
-            # use max date across download and require each ticker to reach the panel max.
             panel_max = y2["date"].max()
             for t, g in y2.groupby("ticker"):
-                if g["date"].max() >= panel_max:
+                if g["date"].max() >= target:
                     covered.add(t)
+
+        print(
+            f"[combined] coverage target=NYSE last complete {target.date()} "
+            f"(yahoo panel_max={panel_max.date() if panel_max is not None else 'n/a'})"
+        )
 
         missing = [t for t in tickers if t not in covered]
         if missing:
-            target_max = None
-            if not y.empty:
-                target_max = (
-                    pd.to_datetime(y["date"]).dt.tz_localize(None).dt.normalize().max()
-                )
             print(
                 f"[combined] single-ticker Yahoo retry for {len(missing)} "
-                f"(missing or behind panel max={target_max.date() if target_max is not None else 'n/a'})"
+                f"(missing or behind NYSE target={target.date()})"
             )
             retry_frames: list[pd.DataFrame] = []
             still: list[str] = []
@@ -270,7 +273,7 @@ class CombinedProvider:
                 one = one.copy()
                 one["date"] = pd.to_datetime(one["date"]).dt.tz_localize(None).dt.normalize()
                 tmax = one["date"].max()
-                if target_max is not None and tmax < target_max:
+                if tmax < target:
                     still.append(t)
                 else:
                     retry_frames.append(one)
