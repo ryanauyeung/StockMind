@@ -68,6 +68,7 @@ data/artifacts/
   cards_shared.json
   cards_sector.json
   cards_stock.json
+  history/                # asof snapshots + index.json (UI date picker)
   ledger.json             # paper books (three families)
   recent_close_error_{shared,sector,stock}.json
   metrics.json            # primary (shared) + scoreboard_headline
@@ -92,7 +93,7 @@ Model dumps under `data/artifacts/models/` are **tracked** (needed for weekday n
 | 11:15 UTC / 19:15 HKT Sunday | Three-family walk-forward retrain. **First Sunday of the month:** refresh S&P list + **full** OHLCV pull and commit the single parquet (housekeep: ~12 blobs/year). Other Sundays keep delta and skip the parquet commit. |
 | Actions → Nightly cards → Run workflow | Manual, optional full retrain |
 
-The workflow checks out and pushes `main`, where the dashboard code lives, so weekday card/ledger commits land on the deployed branch.
+The workflow checks out and pushes `main`, where the dashboard code lives, so weekday card/ledger commits land on the deployed branch. Nightly also commits `data/artifacts/history/` (asof snapshots + `index.json`) with the cards so the UI date picker stays in sync.
 
 No market-data API key. Yahoo first, Stooq fallback.
 
@@ -131,7 +132,7 @@ src/stockmind/     universe, data, features, models (shared/sector/stock), backt
 app/               Streamlit dashboard (zh-HK)
 scripts/           fetch, train, backtest, cards, nightly, run_pipeline
 data/universe/     S&P 500 ticker list
-data/artifacts/    cards*, metrics, scoreboard, models/
+data/artifacts/    cards*, history/, metrics, scoreboard, models/
 tests/
 ```
 

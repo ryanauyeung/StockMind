@@ -64,6 +64,7 @@ jobs:
             data/artifacts/cards_shared.json \
             data/artifacts/cards_sector.json \
             data/artifacts/cards_stock.json \
+            data/artifacts/history/ \
             data/artifacts/metrics.json \
             data/artifacts/scoreboard.json \
             data/artifacts/per_ticker.json \
