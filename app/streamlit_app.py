@@ -38,7 +38,14 @@ from stockmind.history_cards import (
     nearby_asofs,
     next_session_after,
 )
-from stockmind.ledger import ledger_view
+from stockmind.ledger import ledger_view, load_ledger
+from stockmind.two_day import (
+    TWO_DAY_COLUMNS,
+    build_two_day_rows,
+    index_fills,
+    resolve_pair_asofs,
+    session_by_asof_from_ledger,
+)
 from components.tl_widgets import pins_bridge
 
 
@@ -208,6 +215,48 @@ def _card_index_by_ticker(payload: dict | None) -> dict[str, dict]:
         if t:
             out[t] = c
     return out
+
+
+def _two_day_context(family: str, viewing_asof: str | None) -> dict:
+    """Prev/today asofs, prev card index, fill index for B-table."""
+    asofs = list_available_asofs()
+    prev_asof, today_asof = resolve_pair_asofs(asofs, viewing_asof)
+    ledger = load_ledger()
+    prev_payload = load_history_cards(family, prev_asof) if prev_asof else None
+    return {
+        "family": family,
+        "prev_asof": prev_asof,
+        "today_asof": today_asof,
+        "prev_by_ticker": _card_index_by_ticker(prev_payload),
+        "fills_index": index_fills(ledger.get("fills") or []),
+        "session_map": session_by_asof_from_ledger(ledger),
+        "realized_asofs": list(ledger.get("realized_asofs") or []),
+    }
+
+
+def _render_two_day_table(card: dict, ctx: dict | None) -> None:
+    if not ctx:
+        return
+    ticker = str(card.get("ticker") or "").upper()
+    if not ticker:
+        return
+    rows = build_two_day_rows(
+        family=ctx["family"],
+        ticker=ticker,
+        today_asof=ctx.get("today_asof"),
+        prev_asof=ctx.get("prev_asof"),
+        today_card=card,
+        prev_card=(ctx.get("prev_by_ticker") or {}).get(ticker),
+        fills_index=ctx.get("fills_index") or {},
+        session_map=ctx.get("session_map") or {},
+        realized_asofs=ctx.get("realized_asofs") or [],
+    )
+    st.caption("兩日對照（上一交易預測＋結果／今日預測）")
+    st.dataframe(
+        pd.DataFrame(rows, columns=list(TWO_DAY_COLUMNS)),
+        hide_index=True,
+        use_container_width=True,
+    )
 
 
 def _recent_error_summary(card: dict | None) -> str:
@@ -605,10 +654,11 @@ def main() -> None:
     if not cards:
         st.info("此篩選沒有卡片。" if not (search_q or "").strip() else "搜尋／篩選沒有符合嘅卡片。")
     else:
+        two_day_ctx = _two_day_context(key, viewing_asof)
         cols = st.columns(3)
         for i, card in enumerate(cards):
             with cols[i % 3]:
-                _render_card(card, family=key)
+                _render_card(card, family=key, two_day_ctx=two_day_ctx)
 
     st.divider()
     _render_family_metrics(metrics, key)
@@ -1105,7 +1155,7 @@ def _same_row(*builders) -> None:
             build()
 
 
-def _render_card(card: dict, *, family: str = "shared") -> None:
+def _render_card(card: dict, *, family: str = "shared", two_day_ctx: dict | None = None) -> None:
     action = card["action"]
     color = {"做多": "green", "做空": "red", "觀望": "gray"}.get(action, "gray")
     conf = " · 高信心" if card.get("high_confidence") else ""
@@ -1156,6 +1206,8 @@ def _render_card(card: dict, *, family: str = "shared") -> None:
             st.caption(f"最後有 bar：{last_bar}")
     else:
         st.caption("最後有 bar：—")
+    _render_two_day_table(card, two_day_ctx)
+
     p = card.get("pred", {})
     st.write(
         f"前收 **{_fmt_px(card.get('prior_close'))}**　·　"
