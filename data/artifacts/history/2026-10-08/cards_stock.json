@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-09T07:47:28Z",
+  "generated_at_utc": "2026-10-09T11:26:42Z",
   "asof": "2026-10-08",
   "next_session": "下一常規交易時段",
   "model_family": "stock",
@@ -3468,7 +3468,7 @@
       "sector": "Energy",
       "model_family": "stock",
       "dvol_rank": 66,
-      "mae_rank": 265,
+      "mae_rank": 264,
       "mae_score": 0.00964286320910116,
       "dollar_volume": 1612180263.256836,
       "action": "做空",
