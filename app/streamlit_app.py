@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import html
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -218,12 +219,20 @@ def _card_index_by_ticker(payload: dict | None) -> dict[str, dict]:
 
 
 def _two_day_context(family: str, viewing_asof: str | None) -> dict:
-    """Prev/today asofs, prev card index, fill index for B-table."""
+    """Prev/today asofs, prev card index, fill index for B-table.
+
+    Cached in session_state for the (family, prev, today) triple so scrolling /
+    pin toggles / search reruns do not re-parse ledger + history JSON.
+    """
     asofs = list_available_asofs()
     prev_asof, today_asof = resolve_pair_asofs(asofs, viewing_asof)
+    cache_key = f"_tdctx_{family}_{prev_asof}_{today_asof}"
+    cached = st.session_state.get(cache_key)
+    if isinstance(cached, dict) and cached.get("family") == family:
+        return cached
     ledger = load_ledger()
     prev_payload = load_history_cards(family, prev_asof) if prev_asof else None
-    return {
+    ctx = {
         "family": family,
         "prev_asof": prev_asof,
         "today_asof": today_asof,
@@ -232,6 +241,8 @@ def _two_day_context(family: str, viewing_asof: str | None) -> dict:
         "session_map": session_by_asof_from_ledger(ledger),
         "realized_asofs": list(ledger.get("realized_asofs") or []),
     }
+    st.session_state[cache_key] = ctx
+    return ctx
 
 
 def _render_two_day_table(card: dict, ctx: dict | None) -> None:
@@ -252,10 +263,19 @@ def _render_two_day_table(card: dict, ctx: dict | None) -> None:
         realized_asofs=ctx.get("realized_asofs") or [],
     )
     st.caption("兩日對照（上一交易預測＋結果／今日預測）")
-    st.dataframe(
-        pd.DataFrame(rows, columns=list(TWO_DAY_COLUMNS)),
-        hide_index=True,
-        use_container_width=True,
+    # Lightweight HTML instead of st.dataframe: ~100 AgGrid mounts made scroll janky.
+    th = "".join(f"<th>{html.escape(c)}</th>" for c in TWO_DAY_COLUMNS)
+    body = []
+    for r in rows:
+        tds = "".join(
+            f"<td>{html.escape(str(r.get(c, '—') if r.get(c) is not None else '—'))}</td>"
+            for c in TWO_DAY_COLUMNS
+        )
+        body.append(f"<tr>{tds}</tr>")
+    st.markdown(
+        f'<table class="tl-2day"><thead><tr>{th}</tr></thead>'
+        f'<tbody>{"".join(body)}</tbody></table>',
+        unsafe_allow_html=True,
     )
 
 
@@ -341,6 +361,27 @@ button[kind="tertiary"] {
   padding: 0 0.15rem !important;
   line-height: 1 !important;
   margin-bottom: -1rem !important;
+}
+/* Compact two-day table: avoid per-card st.dataframe (heavy DOM / scroll jank) */
+.tl-2day {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin: 0.15rem 0 0.35rem 0;
+  table-layout: auto;
+}
+.tl-2day th, .tl-2day td {
+  border: 1px solid rgba(128,128,128,.35);
+  padding: 0.2rem 0.35rem;
+  text-align: left;
+  white-space: nowrap;
+}
+.tl-2day th {
+  font-weight: 600;
+  background: rgba(128,128,128,.12);
+}
+.tl-2day td:last-child, .tl-2day th:last-child {
+  white-space: normal;
 }
 
 </style>
@@ -1208,13 +1249,26 @@ def _render_card(card: dict, *, family: str = "shared", two_day_ctx: dict | None
         st.caption("最後有 bar：—")
     _render_two_day_table(card, two_day_ctx)
 
+    # 入場／止盈／止損／方向已在兩日表；唔再重複綠底 st.success。
+    if action == "觀望":
+        reason = card.get("reason")
+        if reason:
+            st.caption(f"觀望原因：{reason}")
+
     p = card.get("pred", {})
-    st.write(
-        f"前收 **{_fmt_px(card.get('prior_close'))}**　·　"
-        f"預測高 {_fmt_px(p.get('high', {}).get('q50'))}　"
-        f"低 {_fmt_px(p.get('low', {}).get('q50'))}　"
-        f"收 {_fmt_px(p.get('close', {}).get('q50'))}"
-    )
+    with st.expander("預測分位", expanded=False):
+        st.write(
+            f"前收 **{_fmt_px(card.get('prior_close'))}**　·　"
+            f"預測高 {_fmt_px(p.get('high', {}).get('q50'))}　"
+            f"低 {_fmt_px(p.get('low', {}).get('q50'))}　"
+            f"收 {_fmt_px(p.get('close', {}).get('q50'))}"
+        )
+        st.caption(
+            f"收市 q10/q50/q90：{_fmt_px(p.get('close', {}).get('q10'))} / "
+            f"{_fmt_px(p.get('close', {}).get('q50'))} / {_fmt_px(p.get('close', {}).get('q90'))}　"
+            f"（{_fmt_pct(p.get('close', {}).get('q50_ret'))}）"
+        )
+
     actual = card.get("actual")
     marks = card.get("actual_marks") or {}
     if actual or marks:
@@ -1245,17 +1299,6 @@ def _render_card(card: dict, *, family: str = "shared", two_day_ctx: dict | None
                     "圖例：H/L 帶 = 實際高／低是否落喺預測 q10–q90；"
                     "入場觸價 = 做多 Low≤入場／做空 High≥入場；✓／✗／—"
                 )
-    st.caption(
-        f"收市 q10/q50/q90：{_fmt_px(p.get('close', {}).get('q10'))} / "
-        f"{_fmt_px(p.get('close', {}).get('q50'))} / {_fmt_px(p.get('close', {}).get('q90'))}　"
-        f"（{_fmt_pct(p.get('close', {}).get('q50_ret'))}）"
-    )
-    if action == "觀望":
-        st.info(f"入場：無　·　原因：{card.get('reason')}")
-    else:
-        st.success(
-            f"入場：{card.get('entry')} {_fmt_px(card.get('entry_px'))}　·　止盈前收 {_fmt_px(card.get('tp'))}　·　止損 {_fmt_px(card.get('sl'))}"
-        )
     err = card.get("recent_error") or {}
     scope = err.get("scope") or ("recent" if err.get("n") else "none")
     if scope == "walk_forward":
