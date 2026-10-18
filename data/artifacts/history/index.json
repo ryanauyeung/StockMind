@@ -4,7 +4,7 @@
   "asofs": [
     {
       "asof": "2026-10-16",
-      "generated_at_utc": "2026-10-17T08:39:47Z",
+      "generated_at_utc": "2026-10-18T15:40:13Z",
       "families": {
         "shared": {
           "file": "history/2026-10-16/cards_shared.json",
@@ -16,16 +16,16 @@
         "sector": {
           "file": "history/2026-10-16/cards_sector.json",
           "n_cards": 100,
-          "n_long": 2,
-          "n_short": 82,
+          "n_long": 4,
+          "n_short": 80,
           "n_flat": 16
         },
         "stock": {
           "file": "history/2026-10-16/cards_stock.json",
           "n_cards": 100,
-          "n_long": 22,
-          "n_short": 61,
-          "n_flat": 17
+          "n_long": 25,
+          "n_short": 57,
+          "n_flat": 18
         }
       }
     },
