@@ -4,28 +4,28 @@
   "asofs": [
     {
       "asof": "2026-10-30",
-      "generated_at_utc": "2026-10-31T10:30:39Z",
+      "generated_at_utc": "2026-11-01T17:51:19Z",
       "families": {
         "shared": {
           "file": "history/2026-10-30/cards_shared.json",
           "n_cards": 100,
-          "n_long": 54,
-          "n_short": 19,
+          "n_long": 43,
+          "n_short": 30,
           "n_flat": 27
         },
         "sector": {
           "file": "history/2026-10-30/cards_sector.json",
           "n_cards": 100,
-          "n_long": 45,
-          "n_short": 26,
+          "n_long": 35,
+          "n_short": 36,
           "n_flat": 29
         },
         "stock": {
           "file": "history/2026-10-30/cards_stock.json",
           "n_cards": 100,
-          "n_long": 23,
-          "n_short": 48,
-          "n_flat": 29
+          "n_long": 17,
+          "n_short": 51,
+          "n_flat": 32
         }
       }
     },
