@@ -3,6 +3,33 @@
   "source": "git backfill of cards_*.json unique asof (latest commit per asof)",
   "asofs": [
     {
+      "asof": "2026-11-04",
+      "generated_at_utc": "2026-11-05T12:26:31Z",
+      "families": {
+        "shared": {
+          "file": "history/2026-11-04/cards_shared.json",
+          "n_cards": 100,
+          "n_long": 11,
+          "n_short": 61,
+          "n_flat": 28
+        },
+        "sector": {
+          "file": "history/2026-11-04/cards_sector.json",
+          "n_cards": 100,
+          "n_long": 36,
+          "n_short": 35,
+          "n_flat": 29
+        },
+        "stock": {
+          "file": "history/2026-11-04/cards_stock.json",
+          "n_cards": 100,
+          "n_long": 13,
+          "n_short": 52,
+          "n_flat": 35
+        }
+      }
+    },
+    {
       "asof": "2026-11-03",
       "generated_at_utc": "2026-11-04T12:13:24Z",
       "families": {
